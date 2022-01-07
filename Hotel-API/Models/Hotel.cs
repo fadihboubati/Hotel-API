@@ -8,7 +8,7 @@ namespace Hotel_API.Models
 {
     public class Hotel
     {
-        public int HotelId { get; set; }
+        public int Id { get; set; }
 
         [Display(Name = "Hotel Name")]
         [Required(ErrorMessage = "Enter hotel's name")]

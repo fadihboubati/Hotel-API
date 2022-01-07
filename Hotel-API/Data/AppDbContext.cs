@@ -12,6 +12,7 @@ namespace Hotel_API.Data
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Amenity> Amenities { get; set; }
+        public DbSet<RoomAmenity> RoomAmenities { get; set; }
         public AppDbContext(DbContextOptions options) : base(options)
         {
 
@@ -24,7 +25,7 @@ namespace Hotel_API.Data
             modelBuilder.Entity<Hotel>().HasData(
                 new Hotel
                 {
-                    HotelId = 1,
+                    Id = 1,
                     HotelName = "La Mamounia",
                     Country = "Moroco",
                     City = "Marrakech",
@@ -35,7 +36,7 @@ namespace Hotel_API.Data
 
                 new Hotel
                 {
-                    HotelId = 2,
+                    Id = 2,
                     HotelName = "Al Harir Palace",
                     Country = "Jordan",
                     City = "Amman",
@@ -46,7 +47,7 @@ namespace Hotel_API.Data
 
                 new Hotel
                 {
-                    HotelId = 3,
+                    Id = 3,
                     HotelName = "Four Seasons",
                     Country = "Syria",
                     City = "Damascus",
@@ -60,19 +61,19 @@ namespace Hotel_API.Data
             modelBuilder.Entity<Room>().HasData(
                 new Room
                 {
-                    RoomId = 1,
+                    Id = 1,
                     RoomName = "A1-1",
                     Layout = Layout.OneBedRoom
                 },
                 new Room
                 {
-                    RoomId = 2,
+                    Id = 2,
                     RoomName = "A1-2",
                     Layout = Layout.TwoBedRoom
                 },
                 new Room
                 {
-                    RoomId = 3,
+                    Id = 3,
                     RoomName = "A1-3",
                     Layout = Layout.Studio
                 }
@@ -81,22 +82,25 @@ namespace Hotel_API.Data
             modelBuilder.Entity<Amenity>().HasData(
                 new Amenity
                 {
-                    AmenityId = 1,
+                    Id = 1,
                     AmenityName = "Computer and Internet access"
                 },
                 new Amenity
                 {
-                    AmenityId = 2,
+                    Id = 2,
                     AmenityName = "Washer and Dryer"
                 },
                 new Amenity
                 {
-                    AmenityId = 3,
+                    Id = 3,
                     AmenityName = "Towels"
                 }
 
             );
 
+            modelBuilder.Entity<RoomAmenity>().HasKey(
+                roomAmenity => new { roomAmenity.RoomId, roomAmenity.AmenityId }
+                );
 
         }
     }

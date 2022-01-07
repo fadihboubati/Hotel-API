@@ -54,7 +54,7 @@ namespace Hotel_API.Controllers
         {
             try
             {
-                if (id != amenity.AmenityId)
+                if (id != amenity.Id)
                 {
                     return BadRequest();
                 }
@@ -80,7 +80,7 @@ namespace Hotel_API.Controllers
         public async Task<ActionResult<Amenity>> PostAmenity(Amenity amenity)
         {
             await _amenity.CreteAmenity(amenity);
-            return CreatedAtAction("GetAmenity", new { id = amenity.AmenityId }, amenity);
+            return CreatedAtAction("GetAmenity", new { id = amenity.Id }, amenity);
         }
 
         // DELETE: api/Amenities/5
@@ -106,7 +106,7 @@ namespace Hotel_API.Controllers
         {
             if (id == null) return false;
             var amemities = await _amenity.GetAmenities();
-            return amemities.Any(e => e.AmenityId == id);
+            return amemities.Any(e => e.Id == id);
         }
     }
 }

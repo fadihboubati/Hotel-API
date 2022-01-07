@@ -38,14 +38,19 @@ namespace Hotel_API.Models.Interfaces.Services
 
         public async Task<Room> GetRoom(int? id)
         {
-            Room room = await _context.Rooms.FindAsync(id);
-            return room;
+            return await _context.Rooms
+                .Include(r => r.RoomAmenities)
+                .ThenInclude(rm => rm.Amenity)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
         }
 
         public async Task<List<Room>> GetRooms()
         {
-            List<Room> rooms = await _context.Rooms.ToListAsync();
-            return rooms;
+            return await _context.Rooms
+                .Include(r => r.RoomAmenities)
+                .ThenInclude(rm => rm.Amenity)
+                .ToListAsync();
         }
 
         public async Task<Room> UpdateRoom(int? id, Room room)
@@ -54,5 +59,28 @@ namespace Hotel_API.Models.Interfaces.Services
             await _context.SaveChangesAsync();
             return room;
         }
+
+        public async Task AddAmenityToRoom(int roomId, int amenityId)
+        {
+            RoomAmenity roomAmenity = new RoomAmenity
+            {
+                RoomId = roomId,
+                AmenityId = amenityId
+            };
+
+            _context.Entry(roomAmenity).State = EntityState.Added;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveAmentityFromRoom(int roomId, int amenityId)
+        {
+            var result = await _context.RoomAmenities
+                .FirstOrDefaultAsync(rm => rm.RoomId == roomId && rm.AmenityId == amenityId);
+            _context.Entry(result).State = EntityState.Deleted;
+            await _context.SaveChangesAsync();
+
+        }
+
+
     }
 }
