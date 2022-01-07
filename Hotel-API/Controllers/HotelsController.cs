@@ -7,39 +7,45 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Hotel_API.Data;
 using Hotel_API.Models;
+using Hotel_API.Models.Interfaces;
 
 namespace Hotel_API.Controllers
+
 {
     [Route("api/[controller]")]
     [ApiController]
     public class HotelsController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IHotel _hotel;
 
-        public HotelsController(AppDbContext context)
+        public HotelsController(IHotel hotel)
         {
-            _context = context;
+            _hotel = hotel;
         }
 
         // GET: api/Hotels
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Hotel>>> GetHotels()
         {
-            return await _context.Hotels.ToListAsync();
+            var hotels = await _hotel.GetHotels();
+            return Ok(hotels);
         }
 
         // GET: api/Hotels/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Hotel>> GetHotel(int id)
+        public async Task<ActionResult<Hotel>> GetHotel(int? id)
         {
-            var hotel = await _context.Hotels.FindAsync(id);
-
-            if (hotel == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            return hotel;
+            var hotel = await _hotel.GetHotel(id);
+            if (hotel == null)
+            {
+                return NotFound();
+            }
+            return Ok(hotel);
         }
 
         // PUT: api/Hotels/5
@@ -47,20 +53,18 @@ namespace Hotel_API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutHotel(int id, Hotel hotel)
         {
-            if (id != hotel.HotelId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(hotel).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                if (id != hotel.HotelId)
+                {
+                    return BadRequest();
+                }
+                await _hotel.UpdateHotel(id, hotel);
+                return Ok(hotel);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
-                if (!HotelExists(id))
+                if (!await HotelExists(id))
                 {
                     return NotFound();
                 }
@@ -69,8 +73,6 @@ namespace Hotel_API.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
         }
 
         // POST: api/Hotels
@@ -78,31 +80,34 @@ namespace Hotel_API.Controllers
         [HttpPost]
         public async Task<ActionResult<Hotel>> PostHotel(Hotel hotel)
         {
-            _context.Hotels.Add(hotel);
-            await _context.SaveChangesAsync();
-
+            await _hotel.Create(hotel);
             return CreatedAtAction("GetHotel", new { id = hotel.HotelId }, hotel);
         }
 
         // DELETE: api/Hotels/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteHotel(int id)
+        public async Task<IActionResult> DeleteHotel(int? id)
         {
-            var hotel = await _context.Hotels.FindAsync(id);
-            if (hotel == null)
+            try
+            {
+                if (id == null)
+                {
+                    return NotFound();
+                }
+                await _hotel.DeleteHotel(id);
+                return NoContent();
+            }
+            catch (Exception)
             {
                 return NotFound();
             }
-
-            _context.Hotels.Remove(hotel);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
-        private bool HotelExists(int id)
+        private async Task<bool> HotelExists(int? id)
         {
-            return _context.Hotels.Any(e => e.HotelId == id);
+            if (id == null) return false;
+            var hotels = await _hotel.GetHotels();
+            return hotels.Any(e => e.HotelId == id);
         }
     }
 }

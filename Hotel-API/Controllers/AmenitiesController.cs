@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Hotel_API.Data;
 using Hotel_API.Models;
+using Hotel_API.Models.Interfaces;
 
 namespace Hotel_API.Controllers
 {
@@ -14,53 +15,55 @@ namespace Hotel_API.Controllers
     [ApiController]
     public class AmenitiesController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IAmenity  _amenity;
 
-        public AmenitiesController(AppDbContext context)
+        public AmenitiesController(IAmenity amenity)
         {
-            _context = context;
+            _amenity = amenity;
         }
 
         // GET: api/Amenities
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Amenity>>> GetAmenities()
         {
-            return await _context.Amenities.ToListAsync();
+            var Amenities = await _amenity.GetAmenities();
+            return Ok(Amenities);
         }
 
         // GET: api/Amenities/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Amenity>> GetAmenity(int id)
+        public async Task<ActionResult<Amenity>> GetAmenity(int? id)
         {
-            var amenity = await _context.Amenities.FindAsync(id);
-
-            if (amenity == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            return amenity;
+            var hotel = await _amenity.GetAmenity(id);
+            if (hotel == null)
+            {
+                return NotFound();
+            }
+            return Ok(hotel);
         }
 
         // PUT: api/Amenities/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAmenity(int id, Amenity amenity)
+        public async Task<IActionResult> PutAmenity(int? id, Amenity amenity)
         {
-            if (id != amenity.AmenityId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(amenity).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                if (id != amenity.AmenityId)
+                {
+                    return BadRequest();
+                }
+                await _amenity.UpdateAmenity(id, amenity);
+                return Ok(amenity);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
-                if (!AmenityExists(id))
+                if (!await AmenityExists(id))
                 {
                     return NotFound();
                 }
@@ -69,8 +72,6 @@ namespace Hotel_API.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
         }
 
         // POST: api/Amenities
@@ -78,31 +79,34 @@ namespace Hotel_API.Controllers
         [HttpPost]
         public async Task<ActionResult<Amenity>> PostAmenity(Amenity amenity)
         {
-            _context.Amenities.Add(amenity);
-            await _context.SaveChangesAsync();
-
+            await _amenity.CreteAmenity(amenity);
             return CreatedAtAction("GetAmenity", new { id = amenity.AmenityId }, amenity);
         }
 
         // DELETE: api/Amenities/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAmenity(int id)
+        public async Task<IActionResult> DeleteAmenity(int? id)
         {
-            var amenity = await _context.Amenities.FindAsync(id);
-            if (amenity == null)
+            try
+            {
+                if (id == null)
+                {
+                    return NotFound();
+                }
+                await _amenity.DeleteAmenity(id);
+                return NoContent();
+            }
+            catch (Exception)
             {
                 return NotFound();
             }
-
-            _context.Amenities.Remove(amenity);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
-        private bool AmenityExists(int id)
+        private async Task<bool> AmenityExists(int? id)
         {
-            return _context.Amenities.Any(e => e.AmenityId == id);
+            if (id == null) return false;
+            var amemities = await _amenity.GetAmenities();
+            return amemities.Any(e => e.AmenityId == id);
         }
     }
 }
