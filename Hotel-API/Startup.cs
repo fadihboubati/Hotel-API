@@ -1,4 +1,6 @@
 using Hotel_API.Data;
+using Hotel_API.Models.Interfaces;
+using Hotel_API.Models.Interfaces.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -34,6 +36,10 @@ namespace Hotel_API
                 string connectionString = Configuration.GetConnectionString("DefaultConnection");
                 options.UseSqlServer(connectionString);
             });
+
+            services.AddTransient<IHotel, HotelService>();
+            services.AddTransient<IRoom, RoomService>();
+            services.AddTransient<IAmenity, AmentyService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
