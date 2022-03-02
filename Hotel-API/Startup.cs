@@ -1,6 +1,7 @@
 using Hotel_API.Data;
 using Hotel_API.Models.Interfaces;
 using Hotel_API.Models.Interfaces.Services;
+using Hotel_API.Models.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -40,6 +41,7 @@ namespace Hotel_API
             services.AddTransient<IHotel, HotelService>();
             services.AddTransient<IRoom, RoomService>();
             services.AddTransient<IAmenity, AmentyService>();
+            services.AddTransient<IHotelRoom, HotelRoomService>();
 
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore

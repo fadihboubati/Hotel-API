@@ -40,7 +40,7 @@ namespace Hotel_API.Models.Interfaces.Services
         {
             return await _context.Rooms
                 .Include(r => r.RoomAmenities)
-                .ThenInclude(rm => rm.Amenity)
+                .ThenInclude(ra => ra.Amenity)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
         }
@@ -49,7 +49,7 @@ namespace Hotel_API.Models.Interfaces.Services
         {
             return await _context.Rooms
                 .Include(r => r.RoomAmenities)
-                .ThenInclude(rm => rm.Amenity)
+                .ThenInclude(ra => ra.Amenity)
                 .ToListAsync();
         }
 
@@ -62,20 +62,30 @@ namespace Hotel_API.Models.Interfaces.Services
 
         public async Task AddAmenityToRoom(int roomId, int amenityId)
         {
-            RoomAmenity roomAmenity = new RoomAmenity
-            {
-                RoomId = roomId,
-                AmenityId = amenityId
-            };
+            var result = await _context.RoomAmenities
+                .FirstOrDefaultAsync(ra => ra.RoomId == roomId && ra.AmenityId == amenityId);
 
-            _context.Entry(roomAmenity).State = EntityState.Added;
-            await _context.SaveChangesAsync();
+            if (result != null)
+            {
+                RoomAmenity roomAmenity = new RoomAmenity
+                {
+                    RoomId = roomId,
+                    AmenityId = amenityId
+                };
+
+                _context.Entry(roomAmenity).State = EntityState.Added;
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new KeyNotFoundException();
+            }
         }
 
         public async Task RemoveAmentityFromRoom(int roomId, int amenityId)
         {
             var result = await _context.RoomAmenities
-                .FirstOrDefaultAsync(rm => rm.RoomId == roomId && rm.AmenityId == amenityId);
+                .FirstOrDefaultAsync(ra => ra.RoomId == roomId && ra.AmenityId == amenityId);
             _context.Entry(result).State = EntityState.Deleted;
             await _context.SaveChangesAsync();
 

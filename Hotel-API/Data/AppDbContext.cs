@@ -13,6 +13,7 @@ namespace Hotel_API.Data
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Amenity> Amenities { get; set; }
         public DbSet<RoomAmenity> RoomAmenities { get; set; }
+        public DbSet<HotelRoom> HotelRooms { get; set; }
         public AppDbContext(DbContextOptions options) : base(options)
         {
 
@@ -101,6 +102,9 @@ namespace Hotel_API.Data
             modelBuilder.Entity<RoomAmenity>().HasKey(
                 roomAmenity => new { roomAmenity.RoomId, roomAmenity.AmenityId }
                 );
+
+            modelBuilder.Entity<HotelRoom>().HasKey(
+                hotelRoom => new { hotelRoom.HotelId, hotelRoom.RoomNumber });
 
         }
     }

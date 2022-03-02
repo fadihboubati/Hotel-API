@@ -24,6 +24,8 @@ namespace Hotel_API.Models
 
         [Display(Name = "Room Amenities")]
         public List<RoomAmenity> RoomAmenities { get; set; }
+
+        public List<HotelRoom> HotelRooms { get; set; }
     }
 
     public enum Layout

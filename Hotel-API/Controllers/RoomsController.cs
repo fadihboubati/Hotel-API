@@ -105,8 +105,22 @@ namespace Hotel_API.Controllers
         [HttpPost("{roomId}/Amenity/{amenityId}")]
         public async Task<IActionResult> AddAmenityToRoom(int roomId, int amenityId)
         {
-            await _room.AddAmenityToRoom(roomId, amenityId);
-            return NoContent();
+            try
+            {
+
+                await _room.AddAmenityToRoom(roomId, amenityId);
+                return NoContent();
+
+            }
+            catch (Exception exc)
+            {
+                if (exc is KeyNotFoundException)
+                {
+                    return NotFound();
+                }
+
+                throw;
+            }
         }
 
         [HttpDelete("{roomId}/Amenity/{amenityId}")]
