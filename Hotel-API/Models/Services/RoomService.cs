@@ -65,7 +65,7 @@ namespace Hotel_API.Models.Interfaces.Services
             var result = await _context.RoomAmenities
                 .FirstOrDefaultAsync(ra => ra.RoomId == roomId && ra.AmenityId == amenityId);
 
-            if (result != null)
+            if (result == null)
             {
                 RoomAmenity roomAmenity = new RoomAmenity
                 {
