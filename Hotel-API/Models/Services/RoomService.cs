@@ -38,19 +38,33 @@ namespace Hotel_API.Models.Interfaces.Services
 
         public async Task<Room> GetRoom(int? id)
         {
-            return await _context.Rooms
-                .Include(r => r.RoomAmenities)
-                .ThenInclude(ra => ra.Amenity)
-                .FirstOrDefaultAsync(r => r.Id == id);
+            // // Better Way (using Linq)
+            //return await _context.Rooms
+            //    .Include(r => r.RoomAmenities)
+            //    .ThenInclude(ra => ra.Amenity)
+            //    .FirstOrDefaultAsync(r => r.Id == id);
+
+            // // Explicit way  (using extentions)
+            Room room = await _context.Rooms.FindAsync(id);
+            var amenities = await _context.RoomAmenities
+                .Where(ra => ra.RoomId == id)
+                .Include(a => a.Amenity)
+                .ToListAsync();
+            room.RoomAmenities = amenities;
+            return room;
+
 
         }
 
         public async Task<List<Room>> GetRooms()
         {
-            return await _context.Rooms
-                .Include(r => r.RoomAmenities)
-                .ThenInclude(ra => ra.Amenity)
-                .ToListAsync();
+            return await _context.Rooms.ToListAsync();
+
+            // // Adding more details
+            //return await _context.Rooms
+            //    .Include(r => r.RoomAmenities)
+            //    .ThenInclude(ra => ra.Amenity)
+            //    .ToListAsync();
         }
 
         public async Task<Room> UpdateRoom(int? id, Room room)

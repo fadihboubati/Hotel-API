@@ -70,7 +70,14 @@ namespace Hotel_API.Models.Services
             {
                 _context.Entry(hotelRoom).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
+                return hotelRoom;
             }
+            else
+            {
+                throw new NotImplementedException();
+
+            }
+
         }
 
         public async Task AddRoomToHotel(int? HotelId , HotelRoom hotelRoom)
