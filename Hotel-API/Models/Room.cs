@@ -19,13 +19,15 @@ namespace Hotel_API.Models
         public string RoomName { get; set; }
 
         [Display(Name = "Layout Name")]
-        [Required(ErrorMessage = "Enter room's name")]
+        [Required(ErrorMessage = "Enter Layout's name")]
         public Layout Layout { get; set; }
 
         [Display(Name = "Room Amenities")]
         public List<RoomAmenity> RoomAmenities { get; set; }
 
-        public List<HotelRoom> HotelRooms { get; set; }
+        // public List<HotelRoom> HotelRooms { get; set; }
+        public HotelRoom HotelRooms { get; set; }
+
     }
 
     public enum Layout

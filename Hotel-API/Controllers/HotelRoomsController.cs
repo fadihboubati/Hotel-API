@@ -52,7 +52,7 @@ namespace Hotel_API.Controllers
 
         //PUT: /api/Hotels/{hotelId}/Rooms/{roomNumber}
         //To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut("/api/Hotels/{hotelId}/Rooms/{roomNumber}")]
         public async Task<IActionResult> PutHotelRoom(int HotelId, int RoomNumber, HotelRoom hotelRoom)
         {
             if (HotelId != hotelRoom.HotelId || RoomNumber != hotelRoom.RoomNumber)

@@ -78,6 +78,7 @@ namespace Hotel_API.Models.Interfaces.Services
             }
             else
             {
+                // Amenity already exist
                 throw new KeyNotFoundException();
             }
         }

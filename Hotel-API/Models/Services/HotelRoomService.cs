@@ -64,9 +64,13 @@ namespace Hotel_API.Models.Services
 
         public async Task<HotelRoom> UpdateHotelRoom(int HotelId, int RoomNumber, HotelRoom hotelRoom)
         {
-            _context.Entry(hotelRoom).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            throw new NotImplementedException();
+            var result = _context.HotelRooms.Where(hr => hr.HotelId == HotelId && hr.RoomNumber == RoomNumber);
+
+            if (result != null)
+            {
+                _context.Entry(hotelRoom).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task AddRoomToHotel(int? HotelId , HotelRoom hotelRoom)
