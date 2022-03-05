@@ -60,66 +60,28 @@ namespace Hotel_API.Controllers
                 return BadRequest();
             }
             await _hotelRoom.UpdateHotelRoom(HotelId, RoomNumber, hotelRoom);
-
-            //_context.Entry(hotelRoom).State = EntityState.Modified;
-
-            //try
-            //{
-            //    await _context.SaveChangesAsync();
-            //}
-            //catch (DbUpdateConcurrencyException)
-            //{
-            //    if (!HotelRoomExists(id))
-            //    {
-            //        return NotFound();
-            //    }
-            //    else
-            //    {
-            //        throw;
-            //    }
-            //}
-
             return NoContent();
         }
 
         // POST to add a room to a hotel
         //To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("/api/Hotels/{hotelId}/Rooms")]
-        public async Task<ActionResult> AddRoomToHotel(int? HotelId, HotelRoom hotelRoom)
+        public async Task<ActionResult> AddRoomToHotel(int? hotelId, HotelRoom hotelRoom)
         {
-            if (HotelId == null || hotelRoom == null)
+            if (hotelId == null || hotelRoom == null)
             {
                 return NotFound();
             }
 
             try
             {
-                await _hotelRoom.AddRoomToHotel(HotelId, hotelRoom);
+                await _hotelRoom.AddRoomToHotel(hotelId, hotelRoom);
                 return Ok();
             }
             catch (Exception)
             {
                 throw;
             }
-
-            //var result = _hotelRoom
-            //_context.HotelRooms.Add(hotelRoom);
-            //try
-            //{
-            //    await _context.SaveChangesAsync();
-            //}
-            //catch (DbUpdateException)
-            //{
-            //    if (HotelRoomExists(hotelRoom.HotelId))
-            //    {
-            //        return Conflict();
-            //    }
-            //    else
-            //    {
-            //        throw;
-            //    }
-            //}
-            //return CreatedAtAction("GetHotelRoom", new { id = hotelRoom.HotelId }, hotelRoom);
 
         }
 

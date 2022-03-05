@@ -20,6 +20,8 @@ namespace Hotel_API.Models.Services
         {
             HotelRoom hotelRoom = await _context.HotelRooms
                 .FirstOrDefaultAsync(hr => hr.HotelId == HotelId && hr.RoomNumber == roomNumber);
+            // // Or
+            //HotelRoom hotelRoom = await GetHotelRoom(HotelId, roomNumber);
 
             if (hotelRoom == null)
             {
@@ -33,8 +35,9 @@ namespace Hotel_API.Models.Services
         {
             return await _context.HotelRooms
             .Where(h => h.HotelId == HotelId)
-            .Include(h => h.Room)
-            .ThenInclude(r => r.RoomAmenities)
+            .Include(hr => hr.Hotel)
+            .Include(hr=> hr.Room)
+            .ThenInclude(r=> r.RoomAmenities)
             .ThenInclude(ra => ra.Amenity)
             .FirstOrDefaultAsync(hr => hr.HotelId == HotelId && hr.RoomNumber == RoomNumber);
         }
@@ -45,21 +48,6 @@ namespace Hotel_API.Models.Services
                 .Where(h => h.HotelId == HotelId)
                 .Include(h => h.Room)
                 .ToListAsync();
-
-            //return await _context.Rooms
-            //    .Include(r => r.HotelRooms)
-            //    .ThenInclude(hr => hr.HotelId == HotelId)
-            //    .ToListAsync();
-
-
-            //return await _context.Hotels
-            //    .Include(x => x.HotelRooms)
-            //    .ThenInclude(hr => hr.Room)
-            //    .ToListAsync();
-
-
-
-            throw new NotImplementedException();
         }
 
         public async Task<HotelRoom> UpdateHotelRoom(int HotelId, int RoomNumber, HotelRoom hotelRoom)
@@ -89,19 +77,8 @@ namespace Hotel_API.Models.Services
                 throw new KeyNotFoundException();
             };
 
-            HotelRoom HotelRoom = new HotelRoom
-            {
-                HotelId = (int)HotelId,
-                RoomId = hotelRoom.RoomId,
-                Rate = hotelRoom.Rate,
-                PitFriendly = hotelRoom.PitFriendly,
-                RoomNumber = hotelRoom.RoomNumber,
-
-                //Hotel = hotel,
-                //Room = hotelRoom.Room
-            };
-
-            _context.Entry(HotelRoom).State = EntityState.Added;
+            hotelRoom.HotelId = (int)HotelId;
+            _context.Entry(hotelRoom).State = EntityState.Added;
             await _context.SaveChangesAsync();
 
         }
