@@ -8,7 +8,7 @@ namespace Hotel_API.Models
 {
     public class Hotel
     {
-        public int HotelId { get; set; }
+        public int Id { get; set; }
 
         [Display(Name = "Hotel Name")]
         [Required(ErrorMessage = "Enter hotel's name")]
@@ -48,5 +48,8 @@ namespace Hotel_API.Models
         [MinLength(10, ErrorMessage ="Min 10 numberts")]
         [MaxLength(25, ErrorMessage ="Max 25 numberts")]
         public string PhoneNumber { get; set; }
+
+        // One Hotel has many HotelRoom (Convention 4)
+        public List<HotelRoom> HotelRooms { get; set; }
     }
 }

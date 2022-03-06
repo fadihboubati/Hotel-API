@@ -53,7 +53,7 @@ namespace Hotel_API.Controllers
         {
             try
             {
-                if (id != room.RoomId)
+                if (id != room.Id)
                 {
                     return BadRequest();
                 }
@@ -80,7 +80,7 @@ namespace Hotel_API.Controllers
         public async Task<ActionResult<Room>> PostRoom(Room room)
         {
             await _room.CreateRoom(room);
-            return CreatedAtAction("GetRoom", new { id = room.RoomId }, room);
+            return CreatedAtAction("GetRoom", new { id = room.Id }, room);
         }
 
         // DELETE: api/Rooms/5
@@ -102,11 +102,41 @@ namespace Hotel_API.Controllers
             }
         }
 
+        [HttpPost("{roomId}/Amenity/{amenityId}")]
+        public async Task<IActionResult> AddAmenityToRoom(int roomId, int amenityId)
+        {
+            try
+            {
+
+                await _room.AddAmenityToRoom(roomId, amenityId);
+                return NoContent();
+
+            }
+            catch (Exception exc)
+            {
+                if (exc is KeyNotFoundException)
+                {
+                    return NotFound();
+                }
+
+                throw;
+            }
+        }
+
+        [HttpDelete("{roomId}/Amenity/{amenityId}")]
+        public async Task<IActionResult> RemoveAmentityFromRoom(int roomId, int amenityId)
+        {
+            await _room.RemoveAmentityFromRoom(roomId, amenityId);
+            return NoContent();
+        }
+
         private async Task<bool> RoomExists(int? id)
         {
             if (id == null) return false;
             var room = await _room.GetRooms();
-            return room.Any(e => e.RoomId == id);
+            return room.Any(e => e.Id == id);
         }
+
+
     }
 }

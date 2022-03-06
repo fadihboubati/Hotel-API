@@ -38,14 +38,33 @@ namespace Hotel_API.Models.Interfaces.Services
 
         public async Task<Room> GetRoom(int? id)
         {
+            // // Better Way (using Linq)
+            //return await _context.Rooms
+            //    .Include(r => r.RoomAmenities)
+            //    .ThenInclude(ra => ra.Amenity)
+            //    .FirstOrDefaultAsync(r => r.Id == id);
+
+            // // Explicit way  (using extentions)
             Room room = await _context.Rooms.FindAsync(id);
+            var amenities = await _context.RoomAmenities
+                .Where(ra => ra.RoomId == id)
+                .Include(a => a.Amenity)
+                .ToListAsync();
+            room.RoomAmenities = amenities;
             return room;
+
+
         }
 
         public async Task<List<Room>> GetRooms()
         {
-            List<Room> rooms = await _context.Rooms.ToListAsync();
-            return rooms;
+            return await _context.Rooms.ToListAsync();
+
+            // // Adding more details
+            //return await _context.Rooms
+            //    .Include(r => r.RoomAmenities)
+            //    .ThenInclude(ra => ra.Amenity)
+            //    .ToListAsync();
         }
 
         public async Task<Room> UpdateRoom(int? id, Room room)
@@ -54,5 +73,39 @@ namespace Hotel_API.Models.Interfaces.Services
             await _context.SaveChangesAsync();
             return room;
         }
+
+        public async Task AddAmenityToRoom(int roomId, int amenityId)
+        {
+            var result = await _context.RoomAmenities
+                .FirstOrDefaultAsync(ra => ra.RoomId == roomId && ra.AmenityId == amenityId);
+
+            if (result == null)
+            {
+                RoomAmenity roomAmenity = new RoomAmenity
+                {
+                    RoomId = roomId,
+                    AmenityId = amenityId
+                };
+
+                _context.Entry(roomAmenity).State = EntityState.Added;
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Amenity already exist
+                throw new KeyNotFoundException();
+            }
+        }
+
+        public async Task RemoveAmentityFromRoom(int roomId, int amenityId)
+        {
+            var result = await _context.RoomAmenities
+                .FirstOrDefaultAsync(ra => ra.RoomId == roomId && ra.AmenityId == amenityId);
+            _context.Entry(result).State = EntityState.Deleted;
+            await _context.SaveChangesAsync();
+
+        }
+
+
     }
 }

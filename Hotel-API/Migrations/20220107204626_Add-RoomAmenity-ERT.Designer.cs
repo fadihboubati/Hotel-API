@@ -3,14 +3,16 @@ using Hotel_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Hotel_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220107204626_Add-RoomAmenity-ERT")]
+    partial class AddRoomAmenityERT
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,31 +128,6 @@ namespace Hotel_API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Hotel_API.Models.HotelRoom", b =>
-                {
-                    b.Property<int>("HotelId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoomNumber")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("PitFriendly")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.HasKey("HotelId", "RoomNumber");
-
-                    b.HasIndex("RoomId")
-                        .IsUnique();
-
-                    b.ToTable("HotelRooms");
-                });
-
             modelBuilder.Entity("Hotel_API.Models.Room", b =>
                 {
                     b.Property<int>("Id")
@@ -203,38 +180,19 @@ namespace Hotel_API.Migrations
 
                     b.HasIndex("AmenityId");
 
-                    b.ToTable("RoomAmenities");
-                });
-
-            modelBuilder.Entity("Hotel_API.Models.HotelRoom", b =>
-                {
-                    b.HasOne("Hotel_API.Models.Hotel", "Hotel")
-                        .WithMany("HotelRooms")
-                        .HasForeignKey("HotelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Hotel_API.Models.Room", "Room")
-                        .WithOne("HotelRooms")
-                        .HasForeignKey("Hotel_API.Models.HotelRoom", "RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Hotel");
-
-                    b.Navigation("Room");
+                    b.ToTable("RoomAmenity");
                 });
 
             modelBuilder.Entity("Hotel_API.Models.RoomAmenity", b =>
                 {
                     b.HasOne("Hotel_API.Models.Amenity", "Amenity")
-                        .WithMany("RoomAmenities")
+                        .WithMany("roomAmenities")
                         .HasForeignKey("AmenityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Hotel_API.Models.Room", "Room")
-                        .WithMany("RoomAmenities")
+                        .WithMany("roomAmenities")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -246,19 +204,12 @@ namespace Hotel_API.Migrations
 
             modelBuilder.Entity("Hotel_API.Models.Amenity", b =>
                 {
-                    b.Navigation("RoomAmenities");
-                });
-
-            modelBuilder.Entity("Hotel_API.Models.Hotel", b =>
-                {
-                    b.Navigation("HotelRooms");
+                    b.Navigation("roomAmenities");
                 });
 
             modelBuilder.Entity("Hotel_API.Models.Room", b =>
                 {
-                    b.Navigation("HotelRooms");
-
-                    b.Navigation("RoomAmenities");
+                    b.Navigation("roomAmenities");
                 });
 #pragma warning restore 612, 618
         }

@@ -3,14 +3,16 @@ using Hotel_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Hotel_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220109094232_AddHotelRoom-UpdateHotAndRoomTables")]
+    partial class AddHotelRoomUpdateHotAndRoomTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,8 +147,7 @@ namespace Hotel_API.Migrations
 
                     b.HasKey("HotelId", "RoomNumber");
 
-                    b.HasIndex("RoomId")
-                        .IsUnique();
+                    b.HasIndex("RoomId");
 
                     b.ToTable("HotelRooms");
                 });
@@ -209,14 +210,14 @@ namespace Hotel_API.Migrations
             modelBuilder.Entity("Hotel_API.Models.HotelRoom", b =>
                 {
                     b.HasOne("Hotel_API.Models.Hotel", "Hotel")
-                        .WithMany("HotelRooms")
+                        .WithMany()
                         .HasForeignKey("HotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Hotel_API.Models.Room", "Room")
-                        .WithOne("HotelRooms")
-                        .HasForeignKey("Hotel_API.Models.HotelRoom", "RoomId")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -249,15 +250,8 @@ namespace Hotel_API.Migrations
                     b.Navigation("RoomAmenities");
                 });
 
-            modelBuilder.Entity("Hotel_API.Models.Hotel", b =>
-                {
-                    b.Navigation("HotelRooms");
-                });
-
             modelBuilder.Entity("Hotel_API.Models.Room", b =>
                 {
-                    b.Navigation("HotelRooms");
-
                     b.Navigation("RoomAmenities");
                 });
 #pragma warning restore 612, 618
