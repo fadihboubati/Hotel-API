@@ -40,12 +40,16 @@ namespace Hotel_API.Controllers
                 return NotFound();
             }
 
-            var hotel = await _amenity.GetAmenity(id);
-            if (hotel == null)
+            try
             {
+                var AmenityDto = await _amenity.GetAmenity(id);
+                return Ok(AmenityDto);
+            }
+            catch (Exception)
+            {
+
                 return NotFound();
             }
-            return Ok(hotel);
         }
 
         // PUT: api/Amenities/5

@@ -20,7 +20,6 @@ namespace Hotel_API.Models.Interfaces.Services
         {
             Amenity amenity = new Amenity
             {
-                Id = amenityDto.ID,
                 AmenityName = amenityDto.Name
             };
 
@@ -35,6 +34,10 @@ namespace Hotel_API.Models.Interfaces.Services
             {
                 Amenity amenity = await _context.Amenities.Where(a => a.Id == id)
                                 .FirstOrDefaultAsync();
+                if (amenity == null)
+                {
+                    throw new KeyNotFoundException();
+                }
                 _context.Entry(amenity).State = EntityState.Deleted;
                 await _context.SaveChangesAsync();
             }
@@ -66,7 +69,10 @@ namespace Hotel_API.Models.Interfaces.Services
         {
             Amenity amenity = await _context.Amenities.Where(a => a.Id == id)
                 .FirstOrDefaultAsync();
-
+            if (amenity == null)
+            {
+                throw new KeyNotFoundException();
+            }
             return new AmenityDTO { ID = amenity.Id, Name = amenity.AmenityName };
         }
 
