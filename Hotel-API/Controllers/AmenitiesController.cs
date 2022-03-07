@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Hotel_API.Data;
 using Hotel_API.Models;
 using Hotel_API.Models.Interfaces;
+using Hotel_API.Models.DTOs;
 
 namespace Hotel_API.Controllers
 {
@@ -24,7 +25,7 @@ namespace Hotel_API.Controllers
 
         // GET: api/Amenities
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Amenity>>> GetAmenities()
+        public async Task<ActionResult<IEnumerable<AmenityDTO>>> GetAmenities()
         {
             var Amenities = await _amenity.GetAmenities();
             return Ok(Amenities);
@@ -32,7 +33,7 @@ namespace Hotel_API.Controllers
 
         // GET: api/Amenities/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Amenity>> GetAmenity(int? id)
+        public async Task<ActionResult<AmenityDTO>> GetAmenity(int? id)
         {
             if (id == null)
             {
@@ -50,16 +51,16 @@ namespace Hotel_API.Controllers
         // PUT: api/Amenities/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAmenity(int? id, Amenity amenity)
+        public async Task<IActionResult> PutAmenity(int? id, AmenityDTO amenityDto)
         {
             try
             {
-                if (id != amenity.Id)
+                if (id != amenityDto.ID)
                 {
                     return BadRequest();
                 }
-                await _amenity.UpdateAmenity(id, amenity);
-                return Ok(amenity);
+                await _amenity.UpdateAmenity(id, amenityDto);
+                return Ok(amenityDto);
             }
             catch (Exception)
             {
@@ -77,10 +78,10 @@ namespace Hotel_API.Controllers
         // POST: api/Amenities
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Amenity>> PostAmenity(Amenity amenity)
+        public async Task<ActionResult<AmenityDTO>> PostAmenity(AmenityDTO amenity)
         {
             await _amenity.CreteAmenity(amenity);
-            return CreatedAtAction("GetAmenity", new { id = amenity.Id }, amenity);
+            return CreatedAtAction("GetAmenity", new { id = amenity.ID }, amenity);
         }
 
         // DELETE: api/Amenities/5
@@ -106,7 +107,7 @@ namespace Hotel_API.Controllers
         {
             if (id == null) return false;
             var amemities = await _amenity.GetAmenities();
-            return amemities.Any(e => e.Id == id);
+            return amemities.Any(e => e.ID == id);
         }
     }
 }
