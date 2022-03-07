@@ -37,7 +37,7 @@ namespace Hotel_API.Models.Interfaces
         /// </summary>
         /// <param name="amenityDto">A unique amenityDto object</param>
         /// <returns>An updated amenityDto object</returns>
-        Task<Amenity> UpdateAmenity(int? id, Amenity amenity);
+        Task<AmenityDTO> UpdateAmenity(int? id, AmenityDTO amenityDto);
 
         /// <summary>
         /// Deletes an Amenity from the Amenities database table,
