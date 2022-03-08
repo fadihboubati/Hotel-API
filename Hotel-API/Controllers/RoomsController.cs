@@ -78,10 +78,10 @@ namespace Hotel_API.Controllers
         // POST: api/Rooms
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Room>> PostRoom(Room room)
+        public async Task<ActionResult<RoomDTO>> PostRoom(RoomDTO roomDto)
         {
-            await _room.CreateRoom(room);
-            return CreatedAtAction("GetRoom", new { id = room.Id }, room);
+            await _room.CreateRoom(roomDto);
+            return CreatedAtAction("GetRoom", new { id = roomDto.ID }, roomDto);
         }
 
         // DELETE: api/Rooms/5
