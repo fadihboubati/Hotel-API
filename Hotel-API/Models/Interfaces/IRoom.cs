@@ -8,10 +8,10 @@ namespace Hotel_API.Models.Interfaces
 {
     public interface IRoom
     {
-       Task<RoomDTO> CreateRoom(RoomDTO room);
+       Task<RoomDTO> CreateRoom(RoomDTO roomDto);
         Task<List<RoomDTO>> GetRooms();
         Task<RoomDTO> GetRoom(int? id);
-        Task<Room> UpdateRoom(int? id, Room room);
+        Task<RoomDTO> UpdateRoom(int? id, RoomDTO roomDto);
         Task DeleteRoom(int? id);
         Task AddAmenityToRoom(int roomId, int amenityId);
         Task RemoveAmentityFromRoom(int roomId, int amenityId);

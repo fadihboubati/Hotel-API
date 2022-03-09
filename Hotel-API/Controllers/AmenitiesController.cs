@@ -82,10 +82,10 @@ namespace Hotel_API.Controllers
         // POST: api/Amenities
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AmenityDTO>> PostAmenity(AmenityDTO amenity)
+        public async Task<ActionResult<AmenityDTO>> PostAmenity(AmenityDTO amenityDto)
         {
-            await _amenity.CreteAmenity(amenity);
-            return CreatedAtAction("GetAmenity", new { id = amenity.ID }, amenity);
+            await _amenity.CreteAmenity(amenityDto);
+            return CreatedAtAction("GetAmenity", new { id = amenityDto.ID }, amenityDto);
         }
 
         // DELETE: api/Amenities/5

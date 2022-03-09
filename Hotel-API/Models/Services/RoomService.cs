@@ -20,14 +20,16 @@ namespace Hotel_API.Models.Interfaces.Services
 
         public async Task<RoomDTO> CreateRoom(RoomDTO roomDto)
         {
+            // The only difference between the update and the creation is that is in the update we need the ID for updating
             Room room = new Room
             {
-                Id = roomDto.ID,
                 RoomName = roomDto.Name,
                 Layout = (Layout)Enum.Parse(typeof(Layout), roomDto.Layout) // String to enum
             };
             _context.Entry(room).State = EntityState.Added;
             await _context.SaveChangesAsync();
+            roomDto.ID = room.Id; // After save
+
             return roomDto;
         }
 
@@ -48,9 +50,9 @@ namespace Hotel_API.Models.Interfaces.Services
         public async Task<RoomDTO> GetRoom(int? id)
         {
             Room room = await _context.Rooms.FindAsync(id);
-            Layout layout = room.Layout; // ex: OneBedRoom
 
-            string stringValue = layout.ToString(); // => "OneBedRoom", Enum to string
+            Layout layout = room.Layout; // ex: OneBedRoom, datatype: Layout
+            string stringValue = layout.ToString(); // => "OneBedRoom", Enum to string, datatype: string
 
             RoomDTO roomDTO = new RoomDTO
             {
@@ -86,11 +88,19 @@ namespace Hotel_API.Models.Interfaces.Services
             return roomsDTOs;
         }
 
-        public async Task<Room> UpdateRoom(int? id, Room room)
+        public async Task<RoomDTO> UpdateRoom(int? id, RoomDTO roomDto)
         {
+            // The only difference between the update and the creation is that is in the update we need the ID for updating
+            Room room = new Room
+            {
+                Id = roomDto.ID,
+                RoomName = roomDto.Name,
+                Layout = (Layout)Enum.Parse(typeof(Layout), roomDto.Layout) // String to enum
+            };
+
             _context.Entry(room).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return room;
+            return roomDto;
         }
 
         public async Task AddAmenityToRoom(int roomId, int amenityId)

@@ -50,17 +50,17 @@ namespace Hotel_API.Controllers
         // PUT: api/Rooms/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRoom(int? id, Room room)
+        public async Task<IActionResult> PutRoom(int? id, RoomDTO roomDto)
         {
             try
             {
-                if (id != room.Id)
+                if (id != roomDto.ID)
                 {
                     return BadRequest();
                 }
 
-                await _room.UpdateRoom(id, room);
-                return Ok(room);
+                await _room.UpdateRoom(id, roomDto);
+                return Ok(roomDto);
             }
             catch (Exception)
             {

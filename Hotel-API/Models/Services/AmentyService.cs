@@ -25,6 +25,8 @@ namespace Hotel_API.Models.Interfaces.Services
 
             _context.Entry(amenity).State = EntityState.Added;
             await _context.SaveChangesAsync();
+            amenityDto.ID = amenity.Id;
+
             return amenityDto;
         }
 
