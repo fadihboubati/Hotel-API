@@ -90,7 +90,7 @@ namespace Hotel_API.Models.Services
             {
                 throw new KeyNotFoundException();
             };
-
+            hotelRoomDto.HotelID = (int)HotelId;
             HotelRoom hotelRoom = ConvertDTOIntoEntity(hotelRoomDto);
 
             hotelRoom.HotelId = (int)HotelId;
