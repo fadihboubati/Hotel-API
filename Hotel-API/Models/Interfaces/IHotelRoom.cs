@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hotel_API.Models.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Hotel_API.Models.Interfaces
         /// <param name="RoomNumber">The unique RoomNumber used to update find the hotelId target</param>
         /// <param name="hotelRoom">A unique hotelRoom object to updated</param>
         /// <returns>The HotelRoom object that was updated</returns>
-        Task<HotelRoom> UpdateHotelRoom(int HotelId, int RoomNumber, HotelRoom hotelRoom);
+        Task<HotelRoom> UpdateHotelRoom(int HotelId, int RoomNumber, HotelRoomDTO hotelRoomDto);
 
         // DELETE a specific room from a hotel:
         /// <summary>
@@ -36,7 +37,7 @@ namespace Hotel_API.Models.Interfaces
         /// <param name="HotelId">The unique hotelId used to filtter the table</param>
         /// <param name="RoomId">The unique roomNumber used to filter the table</param>
         /// <returns>The single HotelRoom Object</returns>
-        Task<HotelRoom> GetHotelRoom(int? HotelId, int? RoomId);
+        Task<HotelRoomDTO> GetHotelRoom(int? HotelId, int? RoomNumber);
 
         // GET all the rooms for a hotel: 
         /// <summary>
@@ -45,7 +46,7 @@ namespace Hotel_API.Models.Interfaces
         /// </summary>
         /// <param name="HotelId">The unique hotelId used to filter the table</param>
         /// <returns>A list of all HotelRooms with a spacific hotelId</returns>
-        Task<List<HotelRoom>> GetHotelRooms(int? HotelId);
+        Task<List<HotelRoomDTO>> GetHotelRooms(int? HotelId);
 
         /// <summary>
         /// Creates a new HoterlRoom in the HotelRoom table in the database,
@@ -54,6 +55,6 @@ namespace Hotel_API.Models.Interfaces
         /// <param name="HotelId">The unique hotelId that want to add a room to it</param>
         /// <param name="hotelRoom">The hotelRoom obj that want to add it to the HotelRoom table</param>
         /// <returns>The hotelRoom object that was created/added</returns>
-        Task AddRoomToHotel(int? HotelId, HotelRoom hotelRoom);
+        Task AddRoomToHotel(int? HotelId, HotelRoomDTO hotelRoomDto);
     }
 }
