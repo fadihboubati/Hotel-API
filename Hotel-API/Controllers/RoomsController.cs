@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Hotel_API.Data;
 using Hotel_API.Models;
 using Hotel_API.Models.Interfaces;
+using Hotel_API.Models.DTOs;
 
 namespace Hotel_API.Controllers
 {
@@ -24,14 +25,14 @@ namespace Hotel_API.Controllers
 
         // GET: api/Rooms
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Room>>> GetRooms()
+        public async Task<ActionResult<IEnumerable<RoomDTO>>> GetRooms()
         {
             return await _room.GetRooms();
         }
 
         // GET: api/Rooms/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Room>> GetRoom(int? id)
+        public async Task<ActionResult<RoomDTO>> GetRoom(int? id)
         {
             if (id == null)
             {
@@ -49,17 +50,17 @@ namespace Hotel_API.Controllers
         // PUT: api/Rooms/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRoom(int? id, Room room)
+        public async Task<IActionResult> PutRoom(int? id, RoomDTO roomDto)
         {
             try
             {
-                if (id != room.Id)
+                if (id != roomDto.ID)
                 {
                     return BadRequest();
                 }
 
-                await _room.UpdateRoom(id, room);
-                return Ok(room);
+                await _room.UpdateRoom(id, roomDto);
+                return Ok(roomDto);
             }
             catch (Exception)
             {
@@ -77,10 +78,10 @@ namespace Hotel_API.Controllers
         // POST: api/Rooms
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Room>> PostRoom(Room room)
+        public async Task<ActionResult<RoomDTO>> PostRoom(RoomDTO roomDto)
         {
-            await _room.CreateRoom(room);
-            return CreatedAtAction("GetRoom", new { id = room.Id }, room);
+            await _room.CreateRoom(roomDto);
+            return CreatedAtAction("GetRoom", new { id = roomDto.ID }, roomDto);
         }
 
         // DELETE: api/Rooms/5
@@ -134,7 +135,7 @@ namespace Hotel_API.Controllers
         {
             if (id == null) return false;
             var room = await _room.GetRooms();
-            return room.Any(e => e.Id == id);
+            return room.Any(e => e.ID == id);
         }
 
 

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Hotel_API.Data;
 using Hotel_API.Models;
 using Hotel_API.Models.Interfaces;
+using Hotel_API.Models.DTOs;
 
 namespace Hotel_API.Controllers
 
@@ -25,7 +26,7 @@ namespace Hotel_API.Controllers
 
         // GET: api/Hotels
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Hotel>>> GetHotels()
+        public async Task<ActionResult<IEnumerable<HotelDTO>>> GetHotels()
         {
             var hotels = await _hotel.GetHotels();
             return Ok(hotels);
@@ -33,14 +34,14 @@ namespace Hotel_API.Controllers
 
         // GET: api/Hotels/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Hotel>> GetHotel(int? id)
+        public async Task<ActionResult<HotelDTO>> GetHotel(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var hotel = await _hotel.GetHotel(id);
+            HotelDTO hotel = await _hotel.GetHotel(id);
             if (hotel == null)
             {
                 return NotFound();
@@ -107,7 +108,7 @@ namespace Hotel_API.Controllers
         {
             if (id == null) return false;
             var hotels = await _hotel.GetHotels();
-            return hotels.Any(e => e.Id == id);
+            return hotels.Any(e => e.ID == id);
         }
     }
 }

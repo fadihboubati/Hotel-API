@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Hotel_API.Data;
 using Hotel_API.Models;
 using Hotel_API.Models.Interfaces;
+using Hotel_API.Models.DTOs;
 
 namespace Hotel_API.Controllers
 {
@@ -23,7 +24,7 @@ namespace Hotel_API.Controllers
         }
 
         [HttpGet("/api/Hotels/{hotelId}/Rooms")]
-        public async Task<ActionResult<IEnumerable<HotelRoom>>> GetHotelRooms(int? HotelId)
+        public async Task<ActionResult<IEnumerable<HotelRoomDTO>>> GetHotelRooms(int? HotelId)
         {
             if (HotelId == null)
             {
@@ -34,7 +35,7 @@ namespace Hotel_API.Controllers
         }
 
         [HttpGet("/api/Hotels/{hotelId}/Rooms/{roomNumber}")]
-        public async Task<ActionResult<HotelRoom>> GetHotelRoom(int? HotelId, int? roomNumber)
+        public async Task<ActionResult<HotelRoomDTO>> GetHotelRoom(int? HotelId, int? roomNumber)
         {
             if (HotelId == null || roomNumber == null)
             {
@@ -53,29 +54,29 @@ namespace Hotel_API.Controllers
         //PUT: /api/Hotels/{hotelId}/Rooms/{roomNumber}
         //To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("/api/Hotels/{hotelId}/Rooms/{roomNumber}")]
-        public async Task<IActionResult> PutHotelRoom(int HotelId, int RoomNumber, HotelRoom hotelRoom)
+        public async Task<IActionResult> PutHotelRoom(int HotelId, int RoomNumber, HotelRoomDTO hotelRoomDto)
         {
-            if (HotelId != hotelRoom.HotelId || RoomNumber != hotelRoom.RoomNumber)
+            if (HotelId != hotelRoomDto.HotelID || RoomNumber != hotelRoomDto.RoomNumber)
             {
                 return BadRequest();
             }
-            await _hotelRoom.UpdateHotelRoom(HotelId, RoomNumber, hotelRoom);
+            await _hotelRoom.UpdateHotelRoom(HotelId, RoomNumber, hotelRoomDto);
             return NoContent();
         }
 
         // POST to add a room to a hotel
         //To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("/api/Hotels/{hotelId}/Rooms")]
-        public async Task<ActionResult> AddRoomToHotel(int? hotelId, HotelRoom hotelRoom)
+        public async Task<ActionResult> AddRoomToHotel(int? hotelId, HotelRoomDTO hotelRoomDto)
         {
-            if (hotelId == null || hotelRoom == null)
+            if (hotelId == null || hotelRoomDto == null)
             {
                 return NotFound();
             }
 
             try
             {
-                await _hotelRoom.AddRoomToHotel(hotelId, hotelRoom);
+                await _hotelRoom.AddRoomToHotel(hotelId, hotelRoomDto);
                 return Ok();
             }
             catch (Exception)

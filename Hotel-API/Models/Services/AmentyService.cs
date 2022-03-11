@@ -1,4 +1,5 @@
 ﻿using Hotel_API.Data;
+using Hotel_API.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,19 +16,31 @@ namespace Hotel_API.Models.Interfaces.Services
             _context = context;
         }
 
-        public async Task<Amenity> CreteAmenity(Amenity amenity)
+        public async Task<AmenityDTO> CreteAmenity(AmenityDTO amenityDto)
         {
+            Amenity amenity = new Amenity
+            {
+                AmenityName = amenityDto.Name
+            };
+
             _context.Entry(amenity).State = EntityState.Added;
             await _context.SaveChangesAsync();
-            return amenity;
+            amenityDto.ID = amenity.Id;
+
+            return amenityDto;
         }
 
         public async Task DeleteAmenity(int? id)
         {
             try
             {
-                Amenity hotel = await GetAmenity(id);
-                _context.Entry(hotel).State = EntityState.Deleted;
+                Amenity amenity = await _context.Amenities.Where(a => a.Id == id)
+                                .FirstOrDefaultAsync();
+                if (amenity == null)
+                {
+                    throw new KeyNotFoundException();
+                }
+                _context.Entry(amenity).State = EntityState.Deleted;
                 await _context.SaveChangesAsync();
             }
             catch (Exception)
@@ -36,36 +49,41 @@ namespace Hotel_API.Models.Interfaces.Services
             }
         }
 
-        public async Task<List<Amenity>> GetAmenities()
+        public async Task<List<AmenityDTO>> GetAmenities()
         {
             List<Amenity> amenities = await _context.Amenities.ToListAsync();
-            return amenities;
+            List<AmenityDTO> amenityDTOs = new();
+            foreach (var item in amenities)
+            {
+                AmenityDTO amenityDTO = new AmenityDTO
+                {
+                    ID = item.Id,
+                    Name = item.AmenityName
+                };
+
+                amenityDTOs.Add(amenityDTO);
+            }
+
+            return amenityDTOs;
         }
 
-        public async Task<Amenity> GetAmenity(int? id)
+        public async Task<AmenityDTO> GetAmenity(int? id)
         {
-            // // (using Ling)
-            // // Note: you can remove the where, and add arrow function in the FirstOrDefaultAsync
-            // // same as in the Rooms service
-            return await _context.Amenities.Where(a => a.Id == id)
-                .Include(a => a.RoomAmenities)
-                .ThenInclude(ra => ra.Room)
+            Amenity amenity = await _context.Amenities.Where(a => a.Id == id)
                 .FirstOrDefaultAsync();
-
-            // // Explicit way (using extention)
-            //Amenity amenity = await _context.Amenities.FindAsync(id);
-            //List<RoomAmenity> roomAmenity = await _context.RoomAmenities.Where(a => a.AmenityId == id)
-            //    .Include(a => a.Room)
-            //    .ToListAsync();
-            //amenity.RoomAmenities = roomAmenity;
-            //return amenity;
+            if (amenity == null)
+            {
+                throw new KeyNotFoundException();
+            }
+            return new AmenityDTO { ID = amenity.Id, Name = amenity.AmenityName };
         }
 
-        public async Task<Amenity> UpdateAmenity(int? id, Amenity amenity)
+        public async Task<AmenityDTO> UpdateAmenity(int? id, AmenityDTO amenityDto)
         {
+            Amenity amenity = new Amenity { Id = amenityDto.ID, AmenityName = amenityDto.Name };
             _context.Entry(amenity).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return amenity;
+            return amenityDto;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Hotel_API.Data;
+using Hotel_API.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,23 +11,33 @@ namespace Hotel_API.Models.Interfaces.Services
     public class RoomService : IRoom
     {
         private AppDbContext _context;
-        public RoomService(AppDbContext context)
+        private IAmenity _amenityService;
+        public RoomService(AppDbContext context, IAmenity amenityService)
         {
             _context = context;
+            _amenityService = amenityService;
         }
 
-        public async Task<Room> CreateRoom(Room room)
+        public async Task<RoomDTO> CreateRoom(RoomDTO roomDto)
         {
+            // The only difference between the update and the creation is that is in the update we need the ID for updating
+            Room room = new Room
+            {
+                RoomName = roomDto.Name,
+                Layout = (Layout)Enum.Parse(typeof(Layout), roomDto.Layout) // String to enum
+            };
             _context.Entry(room).State = EntityState.Added;
             await _context.SaveChangesAsync();
-            return room;
+            roomDto.ID = room.Id; // After save
+
+            return roomDto;
         }
 
         public async Task DeleteRoom(int? id)
         {
             try
             {
-                Room hotel = await GetRoom(id);
+                RoomDTO hotel = await GetRoom(id);
                 _context.Entry(hotel).State = EntityState.Deleted;
                 await _context.SaveChangesAsync();
             }
@@ -36,42 +47,60 @@ namespace Hotel_API.Models.Interfaces.Services
             }
         }
 
-        public async Task<Room> GetRoom(int? id)
+        public async Task<RoomDTO> GetRoom(int? id)
         {
-            // // Better Way (using Linq)
-            //return await _context.Rooms
-            //    .Include(r => r.RoomAmenities)
-            //    .ThenInclude(ra => ra.Amenity)
-            //    .FirstOrDefaultAsync(r => r.Id == id);
-
-            // // Explicit way  (using extentions)
             Room room = await _context.Rooms.FindAsync(id);
-            var amenities = await _context.RoomAmenities
+
+            Layout layout = room.Layout; // ex: OneBedRoom, datatype: Layout
+            string stringValue = layout.ToString(); // => "OneBedRoom", Enum to string, datatype: string
+
+            RoomDTO roomDTO = new RoomDTO
+            {
+                ID = room.Id,
+                Name = room.RoomName,
+                Layout = stringValue,
+            };
+
+            List<RoomAmenity> RoomAmenities = await _context.RoomAmenities
                 .Where(ra => ra.RoomId == id)
-                .Include(a => a.Amenity)
                 .ToListAsync();
-            room.RoomAmenities = amenities;
-            return room;
 
-
+            roomDTO.Amenities = new List<AmenityDTO>();
+            foreach (var amenity in RoomAmenities)
+            {
+                AmenityDTO amenityDto = await _amenityService.GetAmenity(amenity.AmenityId);
+                roomDTO.Amenities.Add(amenityDto);
+            }
+            return roomDTO;
         }
 
-        public async Task<List<Room>> GetRooms()
+        public async Task<List<RoomDTO>> GetRooms()
         {
-            return await _context.Rooms.ToListAsync();
+            List<RoomDTO> roomsDTOs = new();
+            List<Room> rooms =  await _context.Rooms.ToListAsync();
 
-            // // Adding more details
-            //return await _context.Rooms
-            //    .Include(r => r.RoomAmenities)
-            //    .ThenInclude(ra => ra.Amenity)
-            //    .ToListAsync();
+            foreach (var room in rooms)
+            {
+                RoomDTO roomDto = await GetRoom(room.Id);
+                roomsDTOs.Add(roomDto);
+            }
+
+            return roomsDTOs;
         }
 
-        public async Task<Room> UpdateRoom(int? id, Room room)
+        public async Task<RoomDTO> UpdateRoom(int? id, RoomDTO roomDto)
         {
+            // The only difference between the update and the creation is that is in the update we need the ID for updating
+            Room room = new Room
+            {
+                Id = roomDto.ID,
+                RoomName = roomDto.Name,
+                Layout = (Layout)Enum.Parse(typeof(Layout), roomDto.Layout) // String to enum
+            };
+
             _context.Entry(room).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return room;
+            return roomDto;
         }
 
         public async Task AddAmenityToRoom(int roomId, int amenityId)
