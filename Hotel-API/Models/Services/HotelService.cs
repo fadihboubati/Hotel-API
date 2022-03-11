@@ -41,8 +41,8 @@ namespace Hotel_API.Models.Interfaces.Services
 
         public async Task<HotelDTO> GetHotel(int? id)
         {
+            // First way
             Hotel hotel = await _context.Hotels.FindAsync(id);
-
             HotelDTO hotelDto = new HotelDTO
             {
                 ID = (int)id,
@@ -53,8 +53,18 @@ namespace Hotel_API.Models.Interfaces.Services
                 Phone = hotel.PhoneNumber
 
             };
-
             hotelDto.Rooms = await _hotelRoomService.GetHotelRooms(id);
+
+            // Other way
+            // where the id is equal to the id that was brought in as an argument
+            var hotel2 = await _context.Hotels.Where(h => h.Id == id)
+                                             .Include(h => h.HotelRooms)
+                                             .ThenInclude(hr => hr.Room)
+                                             .ThenInclude(r => r.RoomAmenities)
+                                             .ThenInclude(ra => ra.Amenity)
+                                             .FirstOrDefaultAsync();
+            HotelDTO hotelDto2 = ConvertHotelIntoDTO(hotel);
+
             return hotelDto;
         }
 
@@ -76,5 +86,27 @@ namespace Hotel_API.Models.Interfaces.Services
             await _context.SaveChangesAsync();
             return hotel;
         }
+
+        /// <summary>
+        /// Helper method that takes a hotel  
+        /// and converts it into a hotelDto.
+        /// </summary>
+        /// <param name="hotel">A unique hotel object</param>
+        /// <returns>A hotelRoomDto object</returns>
+        private HotelDTO ConvertHotelIntoDTO(Hotel hotel)
+        {
+            HotelDTO hotelDto = new HotelDTO
+            {
+                ID = hotel.Id,
+                Name = hotel.HotelName,
+                StreetAddress = hotel.StreetAddress,
+                City = hotel.City,
+                State = hotel.State,
+                Phone = hotel.PhoneNumber,
+            };
+
+            return hotelDto;
+        }
+
     }
 }
