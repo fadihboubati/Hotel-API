@@ -1,4 +1,5 @@
 ﻿using Hotel_API.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Hotel_API.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<Room> Rooms { get; set; }
@@ -21,6 +22,7 @@ namespace Hotel_API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // This calls the base method, and Identity needs it
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Hotel>().HasData(
