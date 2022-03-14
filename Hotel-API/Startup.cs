@@ -1,10 +1,12 @@
 using Hotel_API.Data;
+using Hotel_API.Models;
 using Hotel_API.Models.Interfaces;
 using Hotel_API.Models.Interfaces.Services;
 using Hotel_API.Models.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,10 +41,17 @@ namespace Hotel_API
                 options.UseSqlServer(connectionString);
             });
 
+            //Register IDENTITY
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                    .AddEntityFrameworkStores<AppDbContext>();
+                    //.AddDefaultTokenProviders();
+
+            // MAPPING - register my Dependency Injection Services
             services.AddTransient<IHotel, HotelService>();
             services.AddTransient<IRoom, RoomService>();
             services.AddTransient<IAmenity, AmentyService>();
             services.AddTransient<IHotelRoom, HotelRoomService>();
+            services.AddTransient<IUserService, IdentityUserService>();
 
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
