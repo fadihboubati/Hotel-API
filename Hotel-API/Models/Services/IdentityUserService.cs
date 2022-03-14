@@ -24,7 +24,7 @@ namespace Hotel_API.Models.Services
             _context = context;
 
         }
-        public async Task Authenticate(LoginDTO data)
+        public async Task<UserDTO> Authenticate(LoginDTO data)
         
         {
             //_context.Users, _context.Roles, _context.UserRoles, and more ...
@@ -32,7 +32,12 @@ namespace Hotel_API.Models.Services
             var result = await _signInManager.PasswordSignInAsync(user.UserName, data.Password, false, false);
             if (result.Succeeded)
             {
-                return;
+                UserDTO userDto = new UserDTO
+                {
+                    Id = user.Id,
+                    UserName = user.UserName
+                };
+                return userDto;
             }
 
             throw new Exception("Invalid attempt");
@@ -53,7 +58,6 @@ namespace Hotel_API.Models.Services
 
             if (result.Succeeded)
             {
-                //sign the user in if it was successful.
                 return;
             }
 

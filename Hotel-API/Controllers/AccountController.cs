@@ -38,8 +38,8 @@ namespace Hotel_API.Controllers
         {
             try
             {
-                await _userService.Authenticate(data);
-                return Ok("logged in");
+                UserDTO user = await _userService.Authenticate(data);
+                return Ok(user);
             }
             catch (Exception error)
             {

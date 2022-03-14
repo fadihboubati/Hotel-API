@@ -10,6 +10,6 @@ namespace Hotel_API.Models.Interfaces
     public interface IUserService
     {
         public Task Register(RegisterUserDTO data);
-        public Task Authenticate(LoginDTO data);
+        public Task<UserDTO> Authenticate(LoginDTO data);
     }
 }
