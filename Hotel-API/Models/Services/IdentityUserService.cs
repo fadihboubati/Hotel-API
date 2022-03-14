@@ -1,7 +1,9 @@
-﻿using Hotel_API.Models.DTOs;
+﻿using Hotel_API.Data;
+using Hotel_API.Models.DTOs;
 using Hotel_API.Models.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,18 +13,23 @@ namespace Hotel_API.Models.Services
 {
     public class IdentityUserService : IUserService
     {
+        private AppDbContext _context;
         private UserManager<ApplicationUser> _userManager;
         private SignInManager<ApplicationUser> _signInManager;
 
-        public IdentityUserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public IdentityUserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AppDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
 
         }
         public async Task Authenticate(LoginDTO data)
+        
         {
-            var result = await _signInManager.PasswordSignInAsync(data.Email, data.Password, false, false);
+            //_context.Users, _context.Roles, _context.UserRoles, and more ...
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == data.Email);
+            var result = await _signInManager.PasswordSignInAsync(user.UserName, data.Password, false, false);
             if (result.Succeeded)
             {
                 return;
@@ -35,20 +42,18 @@ namespace Hotel_API.Models.Services
         {
             ApplicationUser user = new ApplicationUser()
             {
-                Email = data.Email,
-                UserName = data.Email,
+                UserName = data.UserName,
                 FirstName = data.FirstName,
-                LastName = data.LastName
+                LastName = data.LastName,
+                Email = data.Email
             };
 
-            // Create the user
+            // Create a new user (new record) in the AspNetUsers table
             var result = await _userManager.CreateAsync(user, data.Password);
 
             if (result.Succeeded)
             {
                 //sign the user in if it was successful.
-                await _signInManager.SignInAsync(user, false);
-
                 return;
             }
 
