@@ -1,5 +1,6 @@
 ﻿using Hotel_API.Models.DTOs;
 using Hotel_API.Models.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -45,6 +46,16 @@ namespace Hotel_API.Controllers
             {
                 return BadRequest(error.Message);
             }
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<ActionResult<UserDTO>> Me()
+        {
+            // Following the [Authorize] phase, this.User will be ... you.
+            // Put a breakpoint here and inspect to see what's passed to our getUser method
+            return await _userService.GetUser(this.User);
+            
         }
     }
 }
