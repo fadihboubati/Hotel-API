@@ -1,4 +1,5 @@
 ﻿using Hotel_API.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,13 +11,41 @@ namespace Hotel_API.Data
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
+        public AppDbContext(DbContextOptions options) : base(options)
+        {
+
+        }
+
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Amenity> Amenities { get; set; }
         public DbSet<RoomAmenity> RoomAmenities { get; set; }
         public DbSet<HotelRoom> HotelRooms { get; set; }
-        public AppDbContext(DbContextOptions options) : base(options)
+
+        private int nextId = 1;
+        private void SeedRole(ModelBuilder modelBuilder, string roleName, params string[] permissions)
         {
+            IdentityRole role = new IdentityRole
+            {
+                Id = roleName.ToLower(),
+                Name = roleName,
+                NormalizedName = roleName.ToUpper(),
+                ConcurrencyStamp = Guid.Empty.ToString(),
+            };
+
+            modelBuilder.Entity<IdentityRole>().HasData(role);
+
+            // Go through the permissions list (the params) and seed a new entry for each
+            IdentityRoleClaim<string>[] roleClaims = permissions.Select(permission =>
+            new IdentityRoleClaim<string>
+            {
+                Id = nextId++,
+                RoleId = role.Id,
+                ClaimType = "permissions", // This matches what we did in Startup.cs
+                ClaimValue = permission
+            }).ToArray();
+
+            modelBuilder.Entity<IdentityRoleClaim<string>>().HasData(roleClaims);
 
         }
 
@@ -108,6 +137,11 @@ namespace Hotel_API.Data
             modelBuilder.Entity<HotelRoom>().HasKey(
                 hotelRoom => new { hotelRoom.HotelId, hotelRoom.RoomNumber });
 
+            SeedRole(modelBuilder, "Administrator", "create", "update", "delete");
+            SeedRole(modelBuilder, "Superuser", "create", "update");
+            SeedRole(modelBuilder, "User", "create");
+            SeedRole(modelBuilder, "Guest");
         }
+
     }
 }

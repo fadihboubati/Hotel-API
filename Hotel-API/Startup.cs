@@ -3,6 +3,7 @@ using Hotel_API.Models;
 using Hotel_API.Models.Interfaces;
 using Hotel_API.Models.Interfaces.Services;
 using Hotel_API.Models.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -52,6 +53,7 @@ namespace Hotel_API
             services.AddTransient<IAmenity, AmentyService>();
             services.AddTransient<IHotelRoom, HotelRoomService>();
             services.AddTransient<IUserService, IdentityUserService>();
+            services.AddScoped<JwtTokenService>();
 
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -66,6 +68,26 @@ namespace Hotel_API
                     Version = "v1",
                 });
             });
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            }).AddJwtBearer(options =>
+            {
+                // Tell the authenticaion scheme "how/where" to validate the token + secret
+                options.TokenValidationParameters = JwtTokenService.GetValidationParameters(Configuration);
+            });
+
+            services.AddAuthorization(options =>
+            {
+                // Add "Name of Policy", and the Lambda returns a definition
+                options.AddPolicy("create", policy => policy.RequireClaim("permissions", "create"));
+                options.AddPolicy("update", policy => policy.RequireClaim("permissions", "update"));
+                options.AddPolicy("delete", policy => policy.RequireClaim("permissions", "delete"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,6 +99,10 @@ namespace Hotel_API
             }
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            // The call to app.UseAuthorization() must appear between app.UseRouting() and app.UseEndpoints(...).
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
