@@ -48,14 +48,15 @@ namespace Hotel_API.Controllers
             }
         }
 
-        [Authorize]
+        //[Authorize]
+        //[Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "create")]
         [HttpGet("me")]
         public async Task<ActionResult<UserDTO>> Me()
         {
             // Following the [Authorize] phase, this.User will be ... you.
             // Put a breakpoint here and inspect to see what's passed to our getUser method
             return await _userService.GetUser(this.User);
-            
         }
     }
 }

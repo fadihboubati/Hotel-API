@@ -17,5 +17,7 @@ namespace Hotel_API.Models.DTOs
 
         public string Password { get; set; }
 
+        public List<String> Roles { get; set; }
+
     }
 }

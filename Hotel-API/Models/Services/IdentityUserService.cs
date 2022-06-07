@@ -31,15 +31,20 @@ namespace Hotel_API.Models.Services
         
         {
             //_context.Users, _context.Roles, _context.UserRoles, and more ...
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == data.Email);
-            var result = await _signInManager.PasswordSignInAsync(user.UserName, data.Password, false, false);
+            ApplicationUser user = await _context.Users.FirstOrDefaultAsync(x => x.Email == data.Email);
+            ApplicationUser user2 = await _userManager.FindByEmailAsync(data.Email);
+            if (user == null) return null;
+
+            SignInResult result = await _signInManager.CheckPasswordSignInAsync(user, data.Password, false);
+            SignInResult result2 = await _signInManager.PasswordSignInAsync(user.UserName, data.Password, false, false);
             if (result.Succeeded)
             {
                 UserDTO userDto = new UserDTO
                 {
                     Id = user.Id,
                     UserName = user.UserName,
-                    Token = await _tokenService.GetToken(user, System.TimeSpan.FromMinutes(15))
+                    Token = await _tokenService.GetToken(user, System.TimeSpan.FromMinutes(15)),
+                    Roles = await _userManager.GetRolesAsync(user)
                 };
                 return userDto;
             }
@@ -62,6 +67,7 @@ namespace Hotel_API.Models.Services
 
             if (result.Succeeded)
             {
+                await _userManager.AddToRolesAsync(user, data.Roles);
                 return;
             }
 
@@ -69,15 +75,19 @@ namespace Hotel_API.Models.Services
 
         }
 
-        // Not Working Yet
+
         // Use a "claim" to get a user
         public async Task<UserDTO> GetUser(ClaimsPrincipal principal)
         {
-            var user = await _userManager.GetUserAsync(principal);
+            ApplicationUser user = await _userManager.GetUserAsync(principal);
             return new UserDTO
             {
                 Id = user.Id,
-                UserName = user.UserName
+                UserName = user.UserName,
+                Token = await _tokenService.GetToken(user, System.TimeSpan.FromMinutes(15)),
+                Roles = await _userManager.GetRolesAsync(user)
+
+
             };
         }
     }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,24 +41,31 @@ namespace Hotel_API.Models.Services
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = GetSecurityKey(configuration),
 
-                
                 ValidateIssuer = false,
-                ValidateActor = false
+                ValidateAudience = false,
             };
         }
 
         public async Task<string> GetToken(ApplicationUser user, TimeSpan expiresIn)
         {
-            var principal = await _signInManager.CreateUserPrincipalAsync(user);
+         
+            ClaimsPrincipal principal = await _signInManager.CreateUserPrincipalAsync(user);
             if (principal == null) { return null; }
 
-            var signingKey = GetSecurityKey(_config);
+            SecurityKey signingKey = GetSecurityKey(_config);
 
-            var token = new JwtSecurityToken(
+            JwtSecurityToken token = new JwtSecurityToken(
                   expires: DateTime.UtcNow + expiresIn,
                   signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256),
                   claims: principal.Claims
              );
+
+            //// Add payload to the token
+            ////token.Payload["profilePicture"] = user.profilePicture;
+            //token.Payload["profilePicture"] = "https://upleap.com/blog/wp-content/uploads/2018/10/how-to-create-the-perfect-instagram-profile-picture.jpg";
+
+            //JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            //string jwt = handler.WriteToken(token);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
